@@ -1,0 +1,82 @@
+from pyramid.view import (view_config, view_defaults)
+from pyramid.response import Response
+import HTMLParser
+from bs4 import BeautifulSoup
+import urllib2
+import re
+from lxml.html import fromstring, tostring
+
+def wikiSourceTOCDownloader(url):
+    ''' 
+    This method takes a wikipedia url and downloads the table of content of the wikipedia page
+    @param url: url of wikipedia page 
+    @return toc : Python List whose elements are the items in the table of content of the wiki page
+    '''
+    source = urllib2.urlopen(url).read()    # downloading html source
+    soup = BeautifulSoup(source)
+    toc=soup.find('div',{'id':'toc'}).findAll('a')  #selecting div tag  with id attribute= toc
+    return toc
+    
+
+
+def isHTTPURL(url):
+    '''
+    Method uses the regular expression package of python to check whether 
+    the string entered by the user is a URL 
+    '''
+    flag=False
+    if(re.match('https?://(?:www)?(?:[\w-]{2,255}(?:\.\w{2,6}){1,2})(?:/[\w&%?#-]{1,300})?', url)):
+        flag=True
+    else:
+        flag=False
+    return flag  
+    
+      
+def isWikiURL(httpUrl):
+    '''
+    This method Checks whether a given URL is a wikipedia URL
+    @param url: input url
+    @return: TRUE or False 
+    @requires: isHTTPURL method
+    It first check whether the input URL is a valid URL or not using the isHTTPURL method
+    Then it checks whether it is a valid Wikipedia URL by finding if URL contains the word wikipedia
+    A wikipedia URL has the form 'http://en.wikipedia.org/wiki/Cameroon'
+    if we use the split(".") method of string objects. The word wikipedia will be returned as the
+    second element in the list. That is
+    strWikiURL='http://en.wikipedia.org/wiki/Cameroon'
+    List=strWikiURL.split(".")
+    List[1]=wikipedia
+    
+    '''
+    flag=False
+    if(isHTTPURL(httpUrl)):
+        urlparts=httpUrl.split(".")
+        if(urlparts[1]=="wikipedia"):
+            flag=True   
+    return flag
+
+# First view, available at http://localhost:6543/ or http://0.0.0.0:6543
+@view_config(route_name='home', renderer='templates/welcome.pt')
+def home_view(request):
+    return {'name': 'Wiki Content Scrapper App'}
+
+# View available at  http://0.0.0.0:6543/wikitoc
+@view_config(route_name='ScrappedWikiPageTOC', renderer='templates/result.pt')
+def wiki_toc(request):
+    #request.content_type == 'text/html'
+    wikiurl=request.params['wikiurl']
+    scrapped_toc=""
+    if (isWikiURL(wikiurl)):
+        user_url=wikiSourceTOCDownloader(wikiurl)
+        pageTitle="The table of contents from the html source code downloaded from the wiki page"
+        web="" + wikiurl + "\t"+"is :"+ "\r"
+        for i in range(len(user_url)):
+            scrapped_toc+= HTMLParser.HTMLParser().unescape(str(user_url[i]))+ "\r"
+    else:
+        scrapped_toc="Either you have entered no URL or the URL entered is not a valid Wikipedia URL"
+        pageTitle="ERROR"
+        web="" + wikiurl + "\t"+ "\r"
+    return {'name': 'Wiki TOC View', 'mything':scrapped_toc, 'title': pageTitle, 'site': web}
+        
+        
+
