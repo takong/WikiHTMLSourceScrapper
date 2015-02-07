@@ -1,5 +1,5 @@
-# WikiSourceScrapper
-WikiSourceScrapper is a dynamic python web application which takes a  wikipedia URL as input and downloads the html source code of the wikipedia page. Then it scrapes out the table of contents and paste it in a new page. The starter scaffold which comes bundle with pyramid was used. The requirements specifications as well as the developed bonus features are described in the pdf file included in this project directory.This pdf file contains screen shorts of sample input and output.
+# WikiHTMLSourceScrapper
+WikiHTMLSourceScrapper is a dynamic python web application which takes a  wikipedia URL as input and downloads the html source code of the wikipedia page. Then it scrapes out the table of contents and paste it in a new page. The starter scaffold which comes bundle with pyramid was used. The requirements specifications as well as the developed bonus features are described in the pdf file included in this project directory.This pdf file contains screen shorts of sample input and output.
 
 #Project stucture
 
@@ -69,6 +69,7 @@ serving on http://0.0.0.0:6543
 6. This confirms that the application has been deployed and can be accessed from a web browser through the url http://0.0.0.0:6543 or http://localhost:6543.
 
 7. Open your web browser and insert the url http://0.0.0.0:6543.
+
 
 
 # Running the unit tests
